@@ -17,12 +17,6 @@ using System.Text.Json.Serialization;
 
 namespace calhfaapi.Controller
 {
- public class output
- {
-     public int x   {get;set;}
-     public int y   {get;set;}
- }
-
  [Route("api/[controller]/[action]")]
  [ApiController]
  public class CalhfaController : ControllerBase
@@ -40,6 +34,15 @@ namespace calhfaapi.Controller
    //initializes the config for the sql
    this.configuration = config;
 
+  }
+
+  public class output
+  {
+      public int x   {get;set;}
+      public int y   {get;set;}
+      public int z   {get;set;}
+      public String hello {get;set;}
+      public String world {get;set;}
   }
 
   [HttpGet]
@@ -61,21 +64,33 @@ namespace calhfaapi.Controller
     SqlCommand com2 = new SqlCommand("SELECT COUNT(*) FROM LoanStatus WHERE StatusCode < 410", cnn);
     var count2 = (int)com2.ExecuteScalar();
 
+    SqlCommand com3 = new SqlCommand("SELECT COUNT(*) FROM LoanStatus", cnn);
+    var count3 = (int)com3.ExecuteScalar();
+
     cnn.Close();
 
     
     output o = new output
     {
         x = count,
-        y = count2
+        y = count2,
+        z = count3,
+        hello = "Hey CalHFA reps, how are you today?",
+        world = "Team BigLarry, using ASP.NET Core 5.0 and refrence a (currently local) instance of SQL Server"
     };
     
     //String ret = "first number: " + count + ", second number: " + count2;
-    string jsonString = JsonSerializer.Serialize(o);
 
-    return jsonString;
-    //*/
-    //return _myobject.GetFromSQL(configuration);
+    string ret = JsonSerializer.Serialize(o);
+
+    return ret;
+    /* v CTRL CLICK v */
+    //https://localhost:5001/api/Calhfa/get
+
+    /* 
+      Our current connection string 
+      "Data Source=.;Initial Catalog=biglarrydb;Integrated Security=True"
+    */
   }
 
  }
