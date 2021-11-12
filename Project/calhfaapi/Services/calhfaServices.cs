@@ -2,44 +2,60 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System.Text.Json;
 using calhfaapi.Models;
-
-
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using System.Threading.Tasks;
+using System;
 
 namespace calhfaapi.Services
 {
-
- public class Covid19Service
+ public class CalHFAService
  {
+         private IConfiguration Configuration;
+         public CalHFAService(IConfiguration con) {
+           Configuration = con;
+         }
 
-  private readonly HttpClient client = new HttpClient();
+    public String Get() {
+ 
+    Output o = new Output();
 
-  public async Task<Stats> GetWorldStats()
-  {
-   var worldStatTask = client.GetStreamAsync("https://api.covid19api.com/world/total");
+ //using connection String
+    using (SqlConnection cnn = new SqlConnection(Configuration.GetConnectionString("DefaultConnectionString")) )
+    {
+      SqlCommand com = new SqlCommand("SELECT (SELECT COUNT(*) FROM Loan) AS ComplianceLoansInLine, (SELECT MAX(StatusDate) FROM LoanStatus) AS ComplianceDate, (SELECT COUNT(*) FROM LoanType) AS SuspenseLoansInLine, (SELECT MIN(StatusDate) FROM LoanStatus) AS SuspenseDate, (SELECT COUNT(*) FROM LoanStatus) AS PostClosingLoansInLine, (SELECT MAX(ReservDateTime) FROM Loan) AS PostClosingDate, (SELECT COUNT(*) FROM LoanCategory) AS PostClosingSuspenseLoansInLine, (SELECT MAX(ReservDateTime) FROM Loan) AS PostClosingSuspenseDate", cnn);//oof
 
-   var worldStat = await JsonSerializer.DeserializeAsync<Stats>(await worldStatTask);
+      cnn.Open();
 
-   return worldStat;
+      SqlDataReader reader = com.ExecuteReader();
 
+      while(reader.Read())
+      {
+        o.ComplianceLoansInLine = (int)reader[0];
+        o.ComplianceDate = (DateTime)reader[1];
+        o.SuspenseLoansInLine = (int)reader[2];
+        o.SuspenseDate = (DateTime)reader[3];
+        o.PostClosingLoansInLine = (int)reader[4];
+        o.PostClosingDate = (DateTime)reader[5];
+        o.PostClosingSuspenseLoansInLine = (int)reader[6];
+        o.PostClosingSuspenseDate = (DateTime)reader[7];
+      }
+    }
+    string ret = JsonSerializer.Serialize(o);
+    return ret;
 
-  }
-
-  public int GetFromSQL(IConfiguration conf)
-  {
-    string connectionString = conf.GetConnectionString("DefaultConnectionString");
-    SqlConnection cnn = new SqlConnection(connectionString);
-
-    cnn.Open();
-            
-    SqlCommand com = new SqlCommand("SELECT COUNT(*) FROM LoanStatus WHERE StatusCode >= 410", cnn);
-    var count = (int)com.ExecuteScalar();
-
-    cnn.Close();
+    /* v CTRL CLICK v */
+    //https://localhost:5001/api/Calhfa/get
     
-    return count;
+    /******
+    Need to figure out how to get date only fron 'date' datatype, as it gives date and time 
+    --using a string is a possible option
+    ******/
+
+    /* 
+      Our current connection string 
+      "Data Source=.;Initial Catalog=biglarrydb;Integrated Security=True"
+                                     ^ your local database's name
+    */
   }
 
  }

@@ -31,7 +31,7 @@ namespace calhfaapi
    services.AddControllers();
 
    //add the name of the class build in Services
-   services.AddTransient<Covid19Service>();
+   services.AddTransient<CalHFAService>();
   }
 
   // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
