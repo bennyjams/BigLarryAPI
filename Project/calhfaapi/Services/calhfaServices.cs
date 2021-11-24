@@ -45,6 +45,9 @@ namespace calhfaapi.Services
 
     /* v CTRL CLICK v */
     //https://localhost:5001/api/Calhfa/get
+    //
+    // v for swagger v
+    //https://localhost:5001/swagger/index.html
     
     /******
     Need to figure out how to get date only fron 'date' datatype, as it gives date and time 
