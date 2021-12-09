@@ -1,9 +1,10 @@
 # BigLarryAPI
 A RESTful API which access the SQL database and get information about specific type of loans and their current processing dates.
 
-## Install
+## Dependecies
 .NET 5 https://dotnet.microsoft.com/download/dotnet/5.0 \
 ASP.NET Core
+
 
 ## Get List of Loans of and Dates
 ### Request
@@ -18,7 +19,7 @@ curl -X GET "https://localhost:5001/api/Calhfa/Get" -H  "accept: text/plain"
  ## Connection String
  Connection String is located in appsettings.json at line 11
  
- ##SQL Command
+ ## SQL Command
  SQL command is located in calhfaServices.cs at line 22
  
  
